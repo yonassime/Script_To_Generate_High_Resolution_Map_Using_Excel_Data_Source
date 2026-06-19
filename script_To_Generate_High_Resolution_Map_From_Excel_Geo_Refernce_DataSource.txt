@@ -1,0 +1,81 @@
+# =============================================================================
+# Accession Collection Map Generator — colored by INSTCODE
+# Run this in Google Colab. Upload your Excel file when prompted.
+# =============================================================================
+
+# --- 1. Install required packages (Colab does not have cartopy by default) ---
+!pip install cartopy --quiet
+
+# --- 2. Upload your Excel file ---
+from google.colab import files
+uploaded = files.upload()  # select All_Center_Forage_Colection.xlsx when prompted
+FILE = list(uploaded.keys())[0]
+
+# --- 3. Imports ---
+import pandas as pd
+import matplotlib.pyplot as plt
+import cartopy.crs as ccrs
+import cartopy.feature as cfeature
+
+# --- 4. Load and clean data ---
+df = pd.read_excel(FILE)
+df = df.dropna(subset=["DECLATITUDE", "DECLONGITUDE"])
+df = df[(df["DECLATITUDE"].between(-90, 90)) & (df["DECLONGITUDE"].between(-180, 180))]
+
+print(f"Loaded {len(df):,} accessions with valid coordinates")
+print(df["INSTCODE"].value_counts())
+
+# --- 5. Assign one color per INSTCODE ---
+inst_codes = sorted(df["INSTCODE"].unique())
+palette = ["#E63946", "#2A9D8F", "#1D4ED8", "#F4A261", "#8E44AD",
+           "#2ECC71", "#E76F51", "#264653", "#FFB703", "#9B5DE5"]
+color_map = {code: palette[i % len(palette)] for i, code in enumerate(inst_codes)}
+
+# --- 6. Build the high-resolution map ---
+fig = plt.figure(figsize=(20, 12), dpi=300)          # increase dpi further (e.g. 600) for print quality
+ax = plt.axes(projection=ccrs.Robinson())
+ax.set_global()
+
+ax.add_feature(cfeature.OCEAN, facecolor="#dceefb", zorder=0)
+ax.add_feature(cfeature.LAND, facecolor="#f5f3ee", zorder=0)
+ax.add_feature(cfeature.COASTLINE, linewidth=0.4, edgecolor="#555555", zorder=1)
+ax.add_feature(cfeature.BORDERS, linewidth=0.3, edgecolor="#999999", zorder=1)
+ax.gridlines(linewidth=0.2, color="gray", alpha=0.5, linestyle="--")
+
+for code in inst_codes:
+    sub = df[df["INSTCODE"] == code]
+    ax.scatter(
+        sub["DECLONGITUDE"], sub["DECLATITUDE"],
+        s=8, color=color_map[code], alpha=0.6,
+        edgecolor="black", linewidth=0.1,
+        transform=ccrs.PlateCarree(),
+        label=f"{code} (n={len(sub):,})",
+        zorder=2,
+    )
+
+ax.set_title(
+    "Global Distribution of Forage Germplasm Accessions by Collecting Institute (INSTCODE)",
+    fontsize=18, fontweight="bold", pad=12
+)
+legend = ax.legend(
+    loc="lower left", markerscale=2.5, fontsize=11, frameon=True,
+    title="INSTCODE", title_fontsize=12, framealpha=0.9
+)
+legend.get_frame().set_edgecolor("black")
+
+plt.figtext(
+    0.5, 0.02,
+    f"Total accessions plotted: {len(df):,}  |  Source: {FILE}",
+    ha="center", fontsize=9, color="gray"
+)
+
+plt.tight_layout()
+
+# --- 7. Save high-resolution output (PNG + vector PDF) ---
+plt.savefig("accession_map_by_INSTCODE.png", dpi=300, bbox_inches="tight")
+plt.savefig("accession_map_by_INSTCODE.pdf", bbox_inches="tight")  # vector, infinitely scalable
+plt.show()
+
+# --- 8. Download the files ---
+files.download("accession_map_by_INSTCODE.png")
+files.download("accession_map_by_INSTCODE.pdf")
