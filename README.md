@@ -43,16 +43,7 @@ Applications
 - Collection site visualization
 - Research reports and presentations
 
-Citation
-Sime, Y. (2026).
-Script_To_Generate_High_Resolution_Map_Using_Excel_Data_Source.
-GitHub Repository.
 
-License
-MIT License
 
-Author
-Yonas Sime
 
-Data Management and Germplasm Information Specialist
 
