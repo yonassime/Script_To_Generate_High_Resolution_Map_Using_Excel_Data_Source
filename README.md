@@ -43,7 +43,8 @@ Applications
 - Collection site visualization
 - Research reports and presentations
 
-<img width="1366" height="768" alt="image" src="https://github.com/user-attachments/assets/810da3f9-bfc2-41c5-8a4a-4f41105aa7d7" />
+
+<img width="668" height="94" alt="Choose a File - Dialog box" src="https://github.com/user-attachments/assets/9a70d036-b744-4387-a6e7-dafb52eba457" />
 
 <img width="5970" height="3403" alt="download" src="https://github.com/user-attachments/assets/652bed60-7b8b-4e79-a297-a308cf9d7c89" />
 
